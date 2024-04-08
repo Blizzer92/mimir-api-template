@@ -1,1 +1,1 @@
-# mimir-api-template
+# Mimir API
