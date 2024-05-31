@@ -1,23 +1,37 @@
 import express from 'express'
-import{ Request, Response } from 'express';
+import { Request, Response } from 'express';
 import bodyParser from 'body-parser'
 import cors from 'cors'
 import { cards } from './data/cards'
 import { Card } from './models/Card'
+import { Game } from './models/Game';
 
+const game = new Game();
 
 const app = express()
-const port = 3003
+const port = 8000
 
 app.use(cors())
 
 app.use(bodyParser.json())
 
- app.get('/cards', (req: Request, res: Response) => {
-   res.send(cards)
- })
+app.get('/game/load', (req: Request, res: Response) => {
+  res.send(game)
+})
 
- app.post('/add-card', (req: Request, res: Response) => {
+app.get('/game/new', (req: Request, res: Response) => {
+  game.gameCards = new Array<Card>();
+  game.gameCards.push(cards[0]);
+  game.gameCards.push(cards[1]);
+  game.gameCards.push(cards[2]);
+  res.send(game)
+})
+
+app.get('/cards', (req: Request, res: Response) => {
+  res.send(cards)
+})
+
+app.post('/add-card', (req: Request, res: Response) => {
   const card = req.body;
   console.log(JSON.stringify(card));
   cards.push(card);
