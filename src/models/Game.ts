@@ -1,6 +1,7 @@
 import { Card } from "./Card"
 
-export class Game {
+export interface Game {
   gameCards: Card[]
-  playedCards: [any]
+  cardIndex: number
+  answers: string[]
 }
