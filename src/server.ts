@@ -23,11 +23,11 @@ app.get('/api/state', (req: Request, res: Response) => {
 })
 
 // game REST api
-app.get('/api/game/load', (req: Request, res: Response) => {
+app.get('/api/game', (req: Request, res: Response) => {
   res.send(appState.game);
 })
 
-app.get('/api/game/new', (req: Request, res: Response) => {
+app.post('/api/game', (req: Request, res: Response) => {
   shuffel(cards);
 
   // generate a new game
@@ -41,7 +41,7 @@ app.get('/api/game/new', (req: Request, res: Response) => {
   res.send(appState.game);
 })
 
-app.post('/api/game/answer', (req: Request, res: Response) => {
+app.post('/api/answer', (req: Request, res: Response) => {
   const answer = req.body.answer;
   appState.game.answers.push(answer);
   appState.game.cardIndex++;
@@ -49,19 +49,24 @@ app.post('/api/game/answer', (req: Request, res: Response) => {
   res.send(appState.game.answers)
 })
 
-app.delete('/api/game/delete', (req: Request, res: Response) => {
+app.delete('/api/game', (req: Request, res: Response) => {
   appState.game = { gameCards: [], cardIndex: 0, answers: [] };    
   res.send(appState.game)
 })
 
 // cards REST api
-app.post('/api/card/add', (req: Request, res: Response) => {
+app.get('/api/cards', (req: Request, res: Response) => {
+  res.send(appState.cards)
+})
+
+// cards REST api
+app.post('/api/card', (req: Request, res: Response) => {
   const card = req.body as Card;  
   appState.cards.push(card);
   res.send(card)
 })
 
-app.delete('/api/card/delete', (req: Request, res: Response) => {
+app.delete('/api/card', (req: Request, res: Response) => {
   const cardToDelete = req.body;  
   const cardIndex = cards.findIndex(card => card.id === cardToDelete.id);
 
@@ -73,7 +78,7 @@ app.delete('/api/card/delete', (req: Request, res: Response) => {
   }
 });
 
-app.patch('/api/card/update', (req: Request, res: Response) => {
+app.patch('/api/card', (req: Request, res: Response) => {
   const updatedCard = req.body as Card;
   const cardIndex = cards.findIndex(card => card.id === updatedCard.id);
   if (cardIndex !== -1) {
