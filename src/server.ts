@@ -55,11 +55,6 @@ app.delete('/api/game', (req: Request, res: Response) => {
 })
 
 // cards REST api
-app.get('/api/cards', (req: Request, res: Response) => {
-  res.send(appState.cards)
-})
-
-// cards REST api
 app.post('/api/card', (req: Request, res: Response) => {
   const card = req.body as Card;  
   appState.cards.push(card);
