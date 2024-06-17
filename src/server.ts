@@ -23,18 +23,32 @@ app.get('/api/state', (req: Request, res: Response) => {
 })
 
 // game REST api
-app.get('/api/game', (req: Request, res: Response) => {
+app.get('/api/result', (req: Request, res: Response) => {
+
+  appState.game.gameCards[0].back = cards[0].back;
+  appState.game.gameCards[1].back = cards[1].back;
+  appState.game.gameCards[2].back = cards[2].back;
+
   res.send(appState.game);
 })
 
 app.post('/api/game', (req: Request, res: Response) => {
   shuffel(cards);
 
+  let card1 = cards[0];
+  let card2 = cards[1];
+  let card3 = cards[2];
+
+  card1.back = "";
+  card2.back = "";
+  card3.back = "";
+
+
   // generate a new game
   appState.game.gameCards = new Array<Card>();
-  appState.game.gameCards.push(cards[0]);
-  appState.game.gameCards.push(cards[1]);
-  appState.game.gameCards.push(cards[2]);
+  appState.game.gameCards.push(card1);
+  appState.game.gameCards.push(card2);
+  appState.game.gameCards.push(card3);
   appState.game.cardIndex = 0;
   appState.game.answers = [];
   
