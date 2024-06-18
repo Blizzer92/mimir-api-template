@@ -35,9 +35,9 @@ app.get('/api/result', (req: Request, res: Response) => {
 app.post('/api/game', (req: Request, res: Response) => {
   shuffel(cards);
 
-  let card1 = cards[0];
-  let card2 = cards[1];
-  let card3 = cards[2];
+  let card1 = structuredClone(cards[0]);
+  let card2 = structuredClone(cards[1]);
+  let card3 = structuredClone(cards[2]);
 
   card1.back = "";
   card2.back = "";
