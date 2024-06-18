@@ -35,20 +35,29 @@ app.get('/api/result', (req: Request, res: Response) => {
 app.post('/api/game', (req: Request, res: Response) => {
   shuffel(cards);
 
-  let card1 = structuredClone(cards[0]);
-  let card2 = structuredClone(cards[1]);
-  let card3 = structuredClone(cards[2]);
-
-  card1.back = "";
-  card2.back = "";
-  card3.back = "";
-
-
-  // generate a new game
   appState.game.gameCards = new Array<Card>();
-  appState.game.gameCards.push(card1);
-  appState.game.gameCards.push(card2);
-  appState.game.gameCards.push(card3);
+
+  let card1 : Card;
+  let card2 : Card;
+  let card3 : Card;
+
+
+  if(cards.length >= 1){
+    card1 = structuredClone(cards[0]);
+    card1.back = "";
+    appState.game.gameCards.push(card1);
+  }
+  if(cards.length >= 2){
+    card2 = structuredClone(cards[1]);
+    card2.back = "";
+    appState.game.gameCards.push(card2);
+  }
+  if(cards.length >= 3){ {
+    card3 = structuredClone(cards[2]);
+    card3.back = "";
+    appState.game.gameCards.push(card3);
+  }
+
   appState.game.cardIndex = 0;
   appState.game.answers = [];
   
