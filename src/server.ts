@@ -25,9 +25,15 @@ app.get('/api/state', (req: Request, res: Response) => {
 // game REST api
 app.get('/api/result', (req: Request, res: Response) => {
 
-  appState.game.gameCards[0].back = cards[0].back;
-  appState.game.gameCards[1].back = cards[1].back;
-  appState.game.gameCards[2].back = cards[2].back;
+  if(cards.length >= 1){
+    appState.game.gameCards[0].back = cards[0].back;
+  }
+  if(cards.length >= 2){
+    appState.game.gameCards[1].back = cards[1].back;
+  }
+  if(cards.length >= 3){
+    appState.game.gameCards[2].back = cards[2].back;
+  }
 
   res.send(appState.game);
 })
@@ -52,7 +58,7 @@ app.post('/api/game', (req: Request, res: Response) => {
     card2.back = "";
     appState.game.gameCards.push(card2);
   }
-  if(cards.length >= 3){ {
+  if(cards.length >= 3){
     card3 = structuredClone(cards[2]);
     card3.back = "";
     appState.game.gameCards.push(card3);
