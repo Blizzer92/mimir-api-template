@@ -6,6 +6,7 @@ import { cards } from "./data/cards";
 import { Card } from "./models/Card";
 import { appState } from "./models/State";
 import { shuffel } from "./Utils";
+import { v4 as createId } from 'uuid'
 
 const app = express();
 const port = 8000;
@@ -67,6 +68,7 @@ app.delete("/api/game", (req: Request, res: Response) => {
 // cards REST api
 app.post("/api/card", (req: Request, res: Response) => {
   const card = req.body as Card;
+  card.id = createId();
   appState.cards.push(card);
   res.send(card);
 });
