@@ -85,7 +85,7 @@ app.delete("/api/card", (req: Request, res: Response) => {
   }
 });
 
-app.patch("/api/card", (req: Request, res: Response) => {
+app.put("/api/card", (req: Request, res: Response) => {
   const updatedCard = req.body as Card;
   const cardIndex = cards.findIndex((card) => card.id === updatedCard.id);
   if (cardIndex !== -1) {
