@@ -6,7 +6,8 @@ import { cards } from "./data/cards";
 import { Card } from "./models/Card";
 import { appState } from "./models/State";
 import { shuffel } from "./Utils";
-import { v4 as createId } from 'uuid'
+import { v4 as createId } from "uuid";
+import crypto from "crypto";
 
 const app = express();
 const port = 8000;
@@ -95,6 +96,22 @@ app.put("/api/card", (req: Request, res: Response) => {
     res.status(404).send({ error: "Card not found" });
   }
 });
+
+app.get(
+  "/api/password-generator/:password",
+  async (req: Request, res: Response) => {
+    const password = req.params.password;
+    const salt = crypto.randomBytes(16).toString("hex");
+
+    crypto.scrypt(password, salt, 64, (error, derivedKey) => {
+      if (!error) {
+        res.send({ password: derivedKey.toString("hex"), salt: salt });
+      } else {
+        res.status(400).send({ error: "Error while generating password" });
+      }
+    });
+  }
+);
 
 app.listen(port, () => {
   console.log(`App listening at http://localhost:${port}`);
