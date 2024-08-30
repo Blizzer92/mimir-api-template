@@ -1,6 +1,6 @@
 import { User } from '../models/User';
 
-export let user: User[] = [
+export let users: User[] = [
     {name: "player", password: "48267ed2a9f0bb144a391d73a378c6e5c3cfa1f33e0b026fe2d817f638709bbe7aaeb296d4b9706138273c0a5a1287b8608588417f3ca1a60b1fe9fe69d50d6c", salt : "c1c4804fd54dd8c10035fc58731cdcb6", roles: ["player"]},
     {name: "admin", password: "4775247c5925131cfd229d775db7162e0ff30547dfa50669655f535675a614ef6b0c01241d9540447475be8e9b7df772e6e19ea41f09588a5b6cf2e0c3dcace3", salt : "81dbca95d2ece3e3293b629f445a7a89", roles: ["admin"]},
     {name: "reto", password: "096b0e0093efaf78614f8f4c40becbe9d454f45c198910b8bd2217b1d9b597fbb140b7f6e13af9db86f97f335df851b84ac02a956bf5ead67b53336658a8457e", salt : "0371eb94fb03d13b62cde06ecad6106a", roles: ["player", "admin"]},

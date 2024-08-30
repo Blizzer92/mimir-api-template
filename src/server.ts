@@ -5,9 +5,10 @@ import cors from "cors";
 import { cards } from "./data/cards";
 import { Card } from "./models/Card";
 import { appState } from "./models/State";
-import { shuffel } from "./Utils";
+import { shuffel, generateJwt } from "./Utils";
 import { v4 as createId } from "uuid";
 import crypto from "crypto";
+import { users } from "./data/users";
 
 const app = express();
 const port = 8000;
@@ -112,6 +113,26 @@ app.get(
     });
   }
 );
+
+app.post("/api/login", async (req: Request, res: Response) => {
+  const { username, password } = req.body;
+  console.log(username)
+  const user = users.find((user) => user.name === username);
+  console.log(user)
+
+  if (user) {
+    crypto.scrypt(password, user.salt, 64, async (error, derivedKey) => {
+      if (!error && derivedKey.toString("hex") === user.password) {
+        const accessToken = await generateJwt(username, user.roles);
+        res.send({ accessToken: accessToken.toString()});
+      } else {
+        res.status(400).send({ error: "incorrect password" });
+      }
+    });
+  } else {
+    res.status(400).send({ error: "User does not exist" });
+  }
+});
 
 app.listen(port, () => {
   console.log(`App listening at http://localhost:${port}`);
