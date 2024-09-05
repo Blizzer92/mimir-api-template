@@ -42,6 +42,7 @@ export const authorize =
       const trimmedToken = token.replace("Bearer ", "");
 
       try {
+        //TODO refactor: type jwtVerify
         const jwt = await jose.jwtVerify(trimmedToken, secret);
         const userRoles = jwt.payload["roles"] as string[]; // Type assertion
 
