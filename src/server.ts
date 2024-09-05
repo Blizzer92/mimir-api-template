@@ -16,7 +16,7 @@ const gameLength = 4;
 
 app.use(cors());
 app.use(bodyParser.json());
-app.use('/api/state', authorize("admin"))
+app.use("/api/state", authorize("admin"));
 
 app.get("/", (req: Request, res: Response) => {
   res.send("<div>Server is up and running</div>");
@@ -117,21 +117,36 @@ app.get(
 
 app.post("/api/login", async (req: Request, res: Response) => {
   const { username, password } = req.body;
-  console.log(username)
   const user = users.find((user) => user.name === username);
-  console.log(user)
+
+  console.log("Login request: ", req.body);
+  console.log("User details: ", user);
 
   if (user) {
     crypto.scrypt(password, user.salt, 64, async (error, derivedKey) => {
       if (!error && derivedKey.toString("hex") === user.password) {
         const accessToken = await generateJwt(username, user.roles);
-        res.send({ accessToken: accessToken.toString()});
+
+        console.log("Login successful for user " + username);
+        res.send({
+          accessToken: accessToken.toString(),
+          username: username,
+          roles: user.roles,
+        });
       } else {
-        res.status(400).send({ error: "incorrect password" });
+        console.log(
+          "Login failed for user " + username + ": incorrect password."
+        );
+        res.status(400).send({
+          error: "Login failed for user " + username + ": incorrect password.",
+        });
       }
     });
   } else {
-    res.status(400).send({ error: "User does not exist" });
+    console.log("Login failed: User " + username + " does not exist.");
+    res
+      .status(400)
+      .send({ error: "Login failed: User " + username + " does not exist." });
   }
 });
 
