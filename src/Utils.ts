@@ -1,3 +1,4 @@
+import { RequestHandler } from "express";
 import { Card } from "./models/Card";
 import * as jose from "jose";
 const secret = new TextEncoder().encode("myDarkSecret");
@@ -31,3 +32,28 @@ export const checkJwt = async (token: string) => {
     return false;
   }
 };
+
+export const authorize =
+  (role: string): RequestHandler =>
+  async (req, res, next) => {
+    const token = req.headers.authorization;
+
+    if (token) {
+      const trimmedToken = token.replace("Bearer ", "");
+
+      try {
+        const jwt = await jose.jwtVerify(trimmedToken, secret);
+        const userRoles = jwt.payload["roles"] as string[]; // Type assertion
+
+        if (Array.isArray(userRoles) && userRoles.includes(role)) {
+          next();
+        } else {
+          res.status(403).send();
+        }
+      } catch (e) {
+        res.status(403).send();
+      }
+    } else {
+      res.status(403).send();
+    }
+  };

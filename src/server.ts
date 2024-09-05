@@ -5,7 +5,7 @@ import cors from "cors";
 import { cards } from "./data/cards";
 import { Card } from "./models/Card";
 import { appState } from "./models/State";
-import { shuffel, generateJwt } from "./Utils";
+import { shuffel, generateJwt, authorize } from "./Utils";
 import { v4 as createId } from "uuid";
 import crypto from "crypto";
 import { users } from "./data/users";
@@ -16,6 +16,7 @@ const gameLength = 4;
 
 app.use(cors());
 app.use(bodyParser.json());
+app.use('/api/state', authorize("admin"))
 
 app.get("/", (req: Request, res: Response) => {
   res.send("<div>Server is up and running</div>");
