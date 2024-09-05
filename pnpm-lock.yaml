@@ -20,6 +20,9 @@ dependencies:
   express:
     specifier: ^4.19.2
     version: 4.19.2
+  jose:
+    specifier: ^5.8.0
+    version: 5.8.0
   tsx:
     specifier: ^4.19.0
     version: 4.19.0
@@ -629,6 +632,10 @@ packages:
   /ipaddr.js@1.9.1:
     resolution: {integrity: sha512-0KI/607xoxSToH7GjN1FfSbLoU0+btTicjsQSWQlh/hZykN8KpmMf7uYwPW3R+akZ6R/w18ZlXSHBYXiYUPO3g==}
     engines: {node: '>= 0.10'}
+    dev: false
+
+  /jose@5.8.0:
+    resolution: {integrity: sha512-E7CqYpL/t7MMnfGnK/eg416OsFCVUrU/Y3Vwe7QjKhu/BkS1Ms455+2xsqZQVN57/U2MHMBvEb5SrmAZWAIntA==}
     dev: false
 
   /media-typer@0.3.0:

@@ -5,8 +5,10 @@ import cors from "cors";
 import { cards } from "./data/cards";
 import { Card } from "./models/Card";
 import { appState } from "./models/State";
-import { shuffel } from "./Utils";
-import { v4 as createId } from 'uuid'
+import { shuffel, generateJwt, authorize } from "./Utils";
+import { v4 as createId } from "uuid";
+import crypto from "crypto";
+import { users } from "./data/users";
 
 const app = express();
 const port = 8000;
@@ -14,6 +16,7 @@ const gameLength = 4;
 
 app.use(cors());
 app.use(bodyParser.json());
+app.use("/api/state", authorize("admin"));
 
 app.get("/", (req: Request, res: Response) => {
   res.send("<div>Server is up and running</div>");
@@ -93,6 +96,57 @@ app.put("/api/card", (req: Request, res: Response) => {
     res.send(updatedCard);
   } else {
     res.status(404).send({ error: "Card not found" });
+  }
+});
+
+app.get(
+  "/api/password-generator/:password",
+  async (req: Request, res: Response) => {
+    const password = req.params.password;
+    const salt = crypto.randomBytes(16).toString("hex");
+
+    crypto.scrypt(password, salt, 64, (error, derivedKey) => {
+      if (!error) {
+        res.send({ password: derivedKey.toString("hex"), salt: salt });
+      } else {
+        res.status(400).send({ error: "Error while generating password" });
+      }
+    });
+  }
+);
+
+app.post("/api/login", async (req: Request, res: Response) => {
+  const { username, password } = req.body;
+  const user = users.find((user) => user.name === username);
+
+  console.log("Login request: ", req.body);
+  console.log("User details: ", user);
+
+  if (user) {
+    crypto.scrypt(password, user.salt, 64, async (error, derivedKey) => {
+      if (!error && derivedKey.toString("hex") === user.password) {
+        const accessToken = await generateJwt(username, user.roles);
+
+        console.log("Login successful for user " + username);
+        res.send({
+          accessToken: accessToken.toString(),
+          username: username,
+          roles: user.roles,
+        });
+      } else {
+        console.log(
+          "Login failed for user " + username + ": incorrect password."
+        );
+        res.status(400).send({
+          error: "Login failed for user " + username + ": incorrect password.",
+        });
+      }
+    });
+  } else {
+    console.log("Login failed: User " + username + " does not exist.");
+    res
+      .status(400)
+      .send({ error: "Login failed: User " + username + " does not exist." });
   }
 });
 
