@@ -16,7 +16,7 @@ const gameLength = 4;
 
 app.use(cors());
 app.use(bodyParser.json());
-app.use("/api/state", authorize("admin"));
+// app.use("/api/state", authorize("admin"));
 
 app.get("/", (req: Request, res: Response) => {
   res.send("<div>Server is up and running</div>");
@@ -115,39 +115,39 @@ app.get(
   }
 );
 
-app.post("/api/login", async (req: Request, res: Response) => {
+app.post("/api/login", (req: Request, res: Response) => {
   const { username, password } = req.body;
   const user = users.find((user) => user.name === username);
 
   console.log("Login request: ", req.body);
   console.log("User details: ", user);
 
-  if (user) {
-    crypto.scrypt(password, user.salt, 64, async (error, derivedKey) => {
-      if (!error && derivedKey.toString("hex") === user.password) {
-        const accessToken = await generateJwt(username, user.roles);
-
-        console.log("Login successful for user " + username);
-        res.send({
-          accessToken: accessToken.toString(),
-          username: username,
-          roles: user.roles,
-        });
-      } else {
-        console.log(
-          "Login failed for user " + username + ": incorrect password."
-        );
-        res.status(400).send({
-          error: "Login failed for user " + username + ": incorrect password.",
-        });
-      }
-    });
-  } else {
+  if (!user) {
     console.log("Login failed: User " + username + " does not exist.");
-    res
+    return res
       .status(400)
       .send({ error: "Login failed: User " + username + " does not exist." });
   }
+
+  crypto.scrypt(password, user.salt, 64, async (error, derivedKey) => {
+    if (error || derivedKey.toString("hex") !== user.password) {
+      console.log(
+        "Login failed for user " + username + ": incorrect password."
+      );
+      return res.status(400).send({
+        error: "Login failed for user " + username + ": incorrect password.",
+      });
+    }
+
+    const accessToken = await generateJwt(username, user.roles);
+
+    console.log("Login successful for user " + username);
+    res.send({
+      accessToken: accessToken.toString(),
+      username: username,
+      roles: user.roles,
+    });
+  });
 });
 
 app.listen(port, () => {

@@ -1,6 +1,7 @@
 import { RequestHandler } from "express";
 import { Card } from "./models/Card";
 import * as jose from "jose";
+import { accessToken } from "./models/AccessToken";
 const secret = new TextEncoder().encode("myDarkSecret");
 
 export const shuffel = (array: Card[]): void => {
@@ -42,8 +43,9 @@ export const authorize =
       const trimmedToken = token.replace("Bearer ", "");
 
       try {
-        const jwt = await jose.jwtVerify(trimmedToken, secret);
-        const userRoles = jwt.payload["roles"] as string[]; // Type assertion
+        //TODO refactor: type jwtVerify
+        const jwt = await jose.jwtVerify<accessToken>(trimmedToken, secret);
+        const userRoles = jwt.payload.roles;
 
         if (Array.isArray(userRoles) && userRoles.includes(role)) {
           next();
@@ -57,3 +59,4 @@ export const authorize =
       res.status(403).send();
     }
   };
+
