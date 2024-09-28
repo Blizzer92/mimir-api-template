@@ -4,7 +4,7 @@ import * as jose from "jose";
 import { accessToken } from "./models/AccessToken";
 const secret = new TextEncoder().encode("myDarkSecret");
 
-export const shuffel = (array: Card[]): void => {
+export const shuffle = (array: Card[]): void => {
   let currentIndex: number = array.length;
   while (currentIndex != 0) {
     let randomIndex = Math.floor(Math.random() * currentIndex);
@@ -23,18 +23,33 @@ export const generateJwt = async (username: string, roles: string[]) =>
     .setExpirationTime("24h")
     .sign(secret);
 
-export const checkJwt = async (token: string) => {
-  try {
-    const jwt = await jose.jwtVerify(token, secret);
-    console.log(jwt.payload.username);
-    console.log(jwt.payload.role);
-    return true;
-  } catch (e) {
-    return false;
-  }
+//  TODO Delete
+// export const checkJwt = async (token: string) => {
+//   try {
+//     const jwt = await jose.jwtVerify(token, secret);
+//     console.log(jwt.payload.username);
+//     console.log(jwt.payload.role);
+//     return true;
+//   } catch (e) {
+//     return false;
+//   }
+// };
+
+export const getUsernameFromJwt = (token?: string): string => {
+  if (token) {
+    const jwt = jose.decodeJwt<accessToken>(token);
+    return jwt.username;
+  } else return "";
 };
 
-export const authorize =
+export const getRolesFromJwt = (token?: string): string[] => {
+  if (token) {
+    const jwt = jose.decodeJwt<accessToken>(token);
+    return jwt.roles;
+  } else return [];
+};
+
+export const authorizeByRole =
   (role: string): RequestHandler =>
   async (req, res, next) => {
     const token = req.headers.authorization;
@@ -43,7 +58,6 @@ export const authorize =
       const trimmedToken = token.replace("Bearer ", "");
 
       try {
-        //TODO refactor: type jwtVerify
         const jwt = await jose.jwtVerify<accessToken>(trimmedToken, secret);
         const userRoles = jwt.payload.roles;
 
@@ -60,3 +74,27 @@ export const authorize =
     }
   };
 
+export const authorizeByUsername =
+  (): RequestHandler => async (req, res, next) => {
+    const token = req.headers.authorization;
+    const username = req.params.username;
+
+    if (token) {
+      const trimmedToken = token.replace("Bearer ", "");
+
+      try {
+        const jwt = await jose.jwtVerify<accessToken>(trimmedToken, secret);
+        const tokenUsername = jwt.payload.username;
+
+        if (username === tokenUsername) {
+          next();
+        } else {
+          res.status(403).send();
+        }
+      } catch (e) {
+        res.status(403).send();
+      }
+    } else {
+      res.status(403).send();
+    }
+  };
