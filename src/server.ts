@@ -22,7 +22,7 @@ const PORT = 8000;
 const GAME_LENGTH = 4;
 const app = express();
 
-const games: Record<string, Game> = {};
+const games: Record<string, {game: Game, solutions: string[]}> = {};
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -36,72 +36,88 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.get("/api/state", async (req: Request, res: Response) => {
+  console.log("GET /api/state called")
+
   // send the state to client
   const username = getUsernameFromJwt(req.headers.authorization);
+  const roles =  getRolesFromJwt(req.headers.authorization)
 
-  // TODO Check if this is working!
-  if ("admin" in getRolesFromJwt()) {
+  // Only append cards to state for admin users
+  if (roles.includes("admin")) {
     appState.cards = cards;
   } else {
     appState.cards = [];
   }
-  appState.game = games[username];
+
+  if(games[username] && games[username].game){
+    appState.game = games[username].game
+  }
+  else{
+    appState.game = { gameCards: [], cardIndex: 0, answers: [] }
+  }
 
   res.send(appState);
 });
 
 // game REST api
 app.get("/api/result/:username", (req: Request, res: Response) => {
+  console.log("GET /api/result/:username called")
   const username = req.params.username;
 
-  for (let i = 0; i < GAME_LENGTH; i++) {
-    if (i < cards.length) {
-      games[username].gameCards[i].back = cards[i].back;
-    }
+  for (let i = 0; i < games[username].game.gameCards.length; i++) {
+    games[username].game.gameCards[i].back = games[username].solutions[i];
   }
 
-  appState.game = games[username];
+  appState.game = games[username].game;
   res.send(appState.game);
 });
 
 app.post("/api/game/:username", (req: Request, res: Response) => {
+  console.log("POST /api/game/:username called")
   const username = req.params.username;
+  games[username].solutions = [];
   let game: Game = { gameCards: [], cardIndex: 0, answers: [] };
 
   shuffle(cards);
   for (let i = 0; i < GAME_LENGTH; i++) {
     if (i < cards.length) {
       game.gameCards.push({ ...cards[i], back: "" });
+      games[username].solutions.push(cards[i].back)
     }
   }
 
-  games[username] = game;
+  games[username].game = game;
   appState.game = game;
 
   res.send(appState.game);
 });
 
 app.post("/api/answer/:username", (req: Request, res: Response) => {
+  console.log("POST /api/answer/:username called")
+
   const username = req.params.username;
   const answer = req.body.answer;
 
-  games[username].answers.push(answer);
-  games[username].cardIndex++;
-  appState.game = games[username];
+  games[username].game.answers.push(answer);
+  games[username].game.cardIndex++;
+  appState.game = games[username].game;
 
   res.send(appState.game.answers);
 });
 
 app.delete("/api/game/:username", (req: Request, res: Response) => {
-  const username = req.params.username;
-  games[username] = { gameCards: [], cardIndex: 0, answers: [] };
+  console.log(" DELETE /api/game/:username called")
 
-  appState.game = games[username];
+  const username = req.params.username;
+  games[username] = {game:{ gameCards: [], cardIndex: 0, answers: [] }, solutions: []};
+
+  appState.game = games[username].game;
   res.send(appState.game);
 });
 
 // cards REST api
 app.post("/api/card", (req: Request, res: Response) => {
+  console.log("POST /api/card called")
   const card = req.body as Card;
   card.id = createId();
   appState.cards.push(card);
@@ -109,6 +125,8 @@ app.post("/api/card", (req: Request, res: Response) => {
 });
 
 app.delete("/api/card", (req: Request, res: Response) => {
+  console.log("DELETE /api/card called")
+
   const cardToDelete = req.body;
   const cardIndex = cards.findIndex((card) => card.id === cardToDelete.id);
 
@@ -121,6 +139,8 @@ app.delete("/api/card", (req: Request, res: Response) => {
 });
 
 app.put("/api/card", (req: Request, res: Response) => {
+  console.log("PUT /api/card called")
+
   const updatedCard = req.body as Card;
   const cardIndex = cards.findIndex((card) => card.id === updatedCard.id);
   if (cardIndex !== -1) {
@@ -148,6 +168,8 @@ app.get(
 );
 
 app.post("/api/login", (req: Request, res: Response) => {
+  console.log("POST /api/login called")
+
   const { username, password } = req.body;
   const user = users.find((user) => user.name === username);
 
@@ -174,7 +196,7 @@ app.post("/api/login", (req: Request, res: Response) => {
     const accessToken = await generateJwt(username, user.roles);
 
     if (!games[username])
-      games[username] = { gameCards: [], cardIndex: 0, answers: [] };
+      games[username] = {game:{ gameCards: [], cardIndex: 0, answers: [] }, solutions: []};
 
     console.log("Login successful for user " + username);
     res.send({
