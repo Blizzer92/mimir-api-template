@@ -23,18 +23,6 @@ export const generateJwt = async (username: string, roles: string[]) =>
     .setExpirationTime("24h")
     .sign(secret);
 
-//  TODO Delete
-// export const checkJwt = async (token: string) => {
-//   try {
-//     const jwt = await jose.jwtVerify(token, secret);
-//     console.log(jwt.payload.username);
-//     console.log(jwt.payload.role);
-//     return true;
-//   } catch (e) {
-//     return false;
-//   }
-// };
-
 export const getUsernameFromJwt = (token?: string): string => {
   if (token) {
     const jwt = jose.decodeJwt<accessToken>(token);

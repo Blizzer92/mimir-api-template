@@ -1,6 +1,5 @@
 # Mimir API
 
-
 # Users
 
 User the following credentials to test the application:
@@ -16,6 +15,10 @@ User the following credentials to test the application:
 
 # Remarks
 
-Deviations which were discussed with Tobi:
+Mit Tobi diskutiert Abweichungen von der Spezifikation:
 
-- User-Role is a 1-n relationship.
+- User-Role ist eine 1-n Beziehung.
+
+Die findings aus Web2 wurden soweit möglich behoben.
+Wir nehmen zur Kenntnis, dass ActionCreator.ts sehr schlecht skaliert und der Appstore nicht exportiert werden soll.
+Dies zu beheben bedingt allerdings eine komplette Überarbeitung unserer Architektur und wurde deshalb so belassen. Gerne nehmen wir Feedback entegegen, wie so etwas sauber und skalierbar aufgebaut werden kann.
