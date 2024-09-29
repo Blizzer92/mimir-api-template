@@ -36,6 +36,8 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.get("/api/state", async (req: Request, res: Response) => {
+  console.log("GET /api/state called")
+
   // send the state to client
   const username = getUsernameFromJwt(req.headers.authorization);
   const roles =  getRolesFromJwt(req.headers.authorization)
@@ -59,6 +61,7 @@ app.get("/api/state", async (req: Request, res: Response) => {
 
 // game REST api
 app.get("/api/result/:username", (req: Request, res: Response) => {
+  console.log("GET /api/result/:username called")
   const username = req.params.username;
 
   for (let i = 0; i < games[username].game.gameCards.length; i++) {
@@ -70,6 +73,7 @@ app.get("/api/result/:username", (req: Request, res: Response) => {
 });
 
 app.post("/api/game/:username", (req: Request, res: Response) => {
+  console.log("POST /api/game/:username called")
   const username = req.params.username;
   games[username].solutions = [];
   let game: Game = { gameCards: [], cardIndex: 0, answers: [] };
@@ -89,6 +93,8 @@ app.post("/api/game/:username", (req: Request, res: Response) => {
 });
 
 app.post("/api/answer/:username", (req: Request, res: Response) => {
+  console.log("POST /api/answer/:username called")
+
   const username = req.params.username;
   const answer = req.body.answer;
 
@@ -100,6 +106,8 @@ app.post("/api/answer/:username", (req: Request, res: Response) => {
 });
 
 app.delete("/api/game/:username", (req: Request, res: Response) => {
+  console.log(" DELETE /api/game/:username called")
+
   const username = req.params.username;
   games[username] = {game:{ gameCards: [], cardIndex: 0, answers: [] }, solutions: []};
 
@@ -109,6 +117,7 @@ app.delete("/api/game/:username", (req: Request, res: Response) => {
 
 // cards REST api
 app.post("/api/card", (req: Request, res: Response) => {
+  console.log("POST /api/card called")
   const card = req.body as Card;
   card.id = createId();
   appState.cards.push(card);
@@ -116,6 +125,8 @@ app.post("/api/card", (req: Request, res: Response) => {
 });
 
 app.delete("/api/card", (req: Request, res: Response) => {
+  console.log("DELETE /api/card called")
+
   const cardToDelete = req.body;
   const cardIndex = cards.findIndex((card) => card.id === cardToDelete.id);
 
@@ -128,6 +139,8 @@ app.delete("/api/card", (req: Request, res: Response) => {
 });
 
 app.put("/api/card", (req: Request, res: Response) => {
+  console.log("PUT /api/card called")
+
   const updatedCard = req.body as Card;
   const cardIndex = cards.findIndex((card) => card.id === updatedCard.id);
   if (cardIndex !== -1) {
@@ -155,6 +168,8 @@ app.get(
 );
 
 app.post("/api/login", (req: Request, res: Response) => {
+  console.log("POST /api/login called")
+
   const { username, password } = req.body;
   const user = users.find((user) => user.name === username);
 
