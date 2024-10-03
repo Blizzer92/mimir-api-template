@@ -211,7 +211,7 @@ app.listen(PORT, () => {
   console.log(`App listening at http://localhost:${PORT}`);
 });
 
-//TODO REMOVE
+// For Debugging purposes
 app.get("/api/gamesrecord", (req: Request, res: Response) => {
   res.send(games);
 });
